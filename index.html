@@ -13,281 +13,13 @@
         href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&family=Montserrat:wght@400;500;600&display=swap"
         rel="stylesheet">
 
-    <style>
-        :root {
-            --bg: #f5f7fb;
-            --card-bg: #ffffff;
-            --primary: #e11a78;
-            --primary-dark: #b0135d;
-            --accent: #143b63;
-            --accent-soft: #e4eef8;
-            --border-soft: #e1e4f0;
-            --text-main: #1f2933;
-            --text-muted: #5f6c80;
-            --pill-radius: 999px;
-            --card-radius: 18px;
-            --shadow-soft: 0 10px 25px rgba(20, 59, 99, 0.08);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #f8fafc 0%, var(--bg) 40%, #fdfbff 100%);
-            color: var(--text-main);
-        }
-
-        .page {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 1.5rem 1.25rem 3rem;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 1.75rem;
-        }
-
-        header img.logo {
-            width: 120px;
-            max-width: 40vw;
-            margin-bottom: 0.75rem;
-        }
-
-        header h1 {
-            font-family: "Lexend", system-ui, sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin: 0 0 0.5rem;
-            color: var(--accent);
-        }
-
-        header p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .section {
-            margin-bottom: 1.75rem;
-        }
-
-        .section-title {
-            font-family: "Lexend", system-ui, sans-serif;
-            font-weight: 600;
-            font-size: 1.05rem;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .section-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 0.75rem;
-        }
-
-        .section-box {
-            background: #ffffff;
-            border: 1px solid var(--border-soft);
-            border-radius: 16px;
-            padding: 1.2rem 1.2rem 1.4rem;
-            box-shadow: var(--shadow-soft);
-            margin-bottom: 1.8rem;
-        }
-
-        .section-box--highlight {
-            background: #fef3fa;
-            border-color: #f8c3df;
-        }
-
-        .card-grid {
-            display: grid;
-            gap: 0.9rem;
-        }
-
-        @media (min-width: 768px) {
-            .card-grid--two {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--card-radius);
-            box-shadow: var(--shadow-soft);
-            padding: 0.95rem 1rem;
-            border: 1px solid var(--border-soft);
-        }
-
-        .card-header {
-            font-family: "Lexend", system-ui, sans-serif;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--accent);
-            margin-bottom: 0.35rem;
-        }
-
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.15rem 0.6rem;
-            border-radius: 999px;
-            font-size: 0.7rem;
-            background: var(--accent-soft);
-            color: var(--accent);
-            margin-bottom: 0.4rem;
-        }
-
-        .rules-list {
-            padding-left: 1.05rem;
-            margin: 0.25rem 0 0;
-            font-size: 0.8rem;
-            line-height: 1.4;
-        }
-
-        .rules-list li+li {
-            margin-top: 0.1rem;
-        }
-
-        /* Linktree-style buttons */
-        .button-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 0.6rem;
-        }
-
-        .pill-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-            width: 100%;
-            padding: 0.8rem 1.1rem;
-            border-radius: var(--pill-radius);
-            border: none;
-            text-decoration: none;
-            background: var(--primary);
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 0.92rem;
-            cursor: pointer;
-            box-shadow: 0 8px 18px rgba(225, 26, 120, 0.3);
-            transition: transform 0.05s ease-out, box-shadow 0.05s ease-out, background 0.1s ease-out;
-        }
-
-        .pill-btn span.label {
-            flex: 1 1 auto;
-            text-align: left;
-        }
-
-        .pill-btn span.meta {
-            font-size: 0.75rem;
-            opacity: 0.9;
-        }
-
-        .pill-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 12px 28px rgba(176, 19, 93, 0.35);
-        }
-
-        .pill-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 6px 14px rgba(176, 19, 93, 0.3);
-        }
-
-        /* GUIDE TABLE LAYOUT */
-        /* GUIDE TABLE LAYOUT */
-        .guide-table {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        /* Two-column layout (text left, image right) */
-        .guide-row {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 1rem;
-            align-items: center;
-            /* vertically align nicely */
-        }
-
-        /* Keep text left-aligned */
-        .guide-text {
-            font-size: 0.85rem;
-            line-height: 1.45;
-        }
-
-        /* Center ONLY the image */
-        .guide-img {
-            text-align: center;
-            /* centers image inside the cell */
-        }
-
-        .guide-img img {
-            width: 170px;
-            /* bigger image */
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-            /* center horizontally */
-            border-radius: 16px;
-            border: 1px solid var(--border-soft);
-            background: #ffffff;
-            box-shadow: 0 4px 10px rgba(20, 59, 99, 0.08);
-        }
-
-        /* MOBILE FIX – stack vertically */
-        @media (max-width: 768px) {
-            .guide-row {
-                grid-template-columns: 1fr;
-                /* stack */
-            }
-
-            .guide-img img {
-                margin: 10px auto 0;
-                width: 200px;
-                /* slightly bigger on mobile */
-            }
-        }
-
-        /* Mobile */
-        @media (max-width: 600px) {
-            .guide-row {
-                grid-template-columns: 1fr;
-            }
-
-            .guide-img img {
-                margin-top: 0.3rem;
-            }
-        }
-
-        .guide-tag {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        footer {
-            margin-top: 1.5rem;
-            text-align: center;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-        }
-    </style>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
     <div class="page">
         <header>
-            <!-- Replace "logo.png" with your actual edm8ker logo path -->
             <img src="images/Edm8ker Logo FA - Black.png" class="logo" alt="edm8ker logo">
             <h1>Edm8ker Inventory Portal</h1>
             <p>Quick reference for storing, taking and tracking materials in the Edm8ker room.</p>
@@ -296,8 +28,9 @@
         <!-- RULES SECTION -->
         <section class="section" id="rules">
             <div class="section-title">Rules</div>
-            <p class="section-subtitle">Read once, follow always. These keep the room fast, safe and organised for
-                everyone.</p>
+            <p class="section-subtitle">
+                Read once, follow always. These keep the room fast, safe and organised for everyone.
+            </p>
 
             <div class="card-grid card-grid--two">
                 <!-- Inventory Rules -->
@@ -324,8 +57,8 @@
                     <div class="card-header">Keep the room usable for everyone</div>
                     <ul class="rules-list">
                         <li>FLOOR MUST BE CLEAR – no bags or loose items on the ground.</li>
-                        <li>DO NOT place items “temporarily” on the floor. Store them properly immediately or at the "TO
-                            BE ORGANISED" rack.</li>
+                        <li>DO NOT place items “temporarily” on the floor. Store them properly immediately or at the
+                            "TO BE ORGANISED" rack.</li>
                         <li>RETURN items to the correct bin. DO NOT MIX different items in one bin.</li>
                         <li>If a bin is FULL, CREATE a new bin, LABEL it and record it on the log sheet.</li>
                         <li>Fold TABLE and STOOL after use and return to assigned area.</li>
@@ -335,11 +68,10 @@
             </div>
         </section>
 
-        <!-- FIND -->
+        <!-- FIND CATEGORY -->
         <section class="section" id="find-category">
             <div class="section-box section-box--highlight">
                 <div class="section-title">Find Your Item Category</div>
-
                 <p class="section-subtitle">
                     Not sure where something is stored? Use this list to check which CATEGORY ZONE
                     your item belongs to, then walk straight there.
@@ -353,13 +85,12 @@
                         <span class="meta">Check which zone to go to</span>
                     </a>
                 </div>
-                <br>
-                <div class="guide-img">
-                    <img src="images/overview-zones.png" alt="Zones">
+
+                <div class="guide-img" style="margin-top:1rem;">
+                    <img src="images/overview-zones.png" alt="Zones overview">
                 </div>
             </div>
         </section>
-
 
         <!-- PERSON IN CHARGE ONLY -->
         <section class="section" id="pic">
@@ -388,7 +119,6 @@
             </div>
         </section>
 
-
         <!-- GUIDE SECTION -->
         <section class="section" id="guide">
             <div class="section-title">New to the room? Start here.</div>
@@ -397,174 +127,277 @@
             </p>
 
             <div class="card-grid">
-
-                <!-- OVERVIEW TABLE -->
-                <article class="card">
-                    <div class="chip">Overview</div>
-                    <div class="card-header">How the system works (in one glance)</div>
-                    <div class="guide-tag">
-                        Goal: find & return items quickly, without touching a computer.
-                    </div>
-                    <div class="guide-table">
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                1. The room is split into ZONES (A–G) such as Tools, General Craft,
-                                Decorative, Electronics, Kits and Valuables.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/overview-zones.png" alt="Zones">
-                            </div>
+                <!-- OVERVIEW ACCORDION -->
+                <details class="accordion" open>
+                    <summary class="accordion-summary">
+                        <span class="summary-main">Overview</span>
+                        <span class="summary-sub">How the system works (in one glance)</span>
+                    </summary>
+                    <div class="accordion-body">
+                        <div class="guide-tag">
+                            Goal: find &amp; return items quickly, without touching a computer.
                         </div>
+                        <div class="guide-table">
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    1. The room is split into ZONES (A–G) such as Tools, General Craft,
+                                    Decorative, Electronics, Kits and Valuables.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/overview-zones.png" alt="Zones">
+                                </div>
+                            </div>
 
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                2. Each item type lives in ONE bin with a bin ID (for example: B2A).
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    2. Each item type lives in ONE bin with a bin ID (for example: B2A).
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/overview-binid.png" alt="Bin ID">
+                                </div>
                             </div>
-                            <div class="guide-img">
-                                <img src="images/overview-binid.png" alt="Bin ID">
-                            </div>
-                        </div>
 
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                3. You NEVER need to search in Excel while packing. Just use zones, bin labels and the
-                                log
-                                sheet.
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    3. You NEVER need to search in Excel while packing. Just use zones, bin labels and
+                                    the log sheet.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/overview-noexcel.png" alt="No Excel">
+                                </div>
                             </div>
-                            <div class="guide-img">
-                                <img src="images/overview-noexcel.png" alt="No Excel">
-                            </div>
-                        </div>
 
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                4. The person-in-charge uses the log sheet to update the Inventory Master Sheet later.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/overview-update.png" alt="PIC updates">
-                            </div>
-                        </div>
-                    </div>
-
-
-                </article>
-
-                <!-- CHECK OUT TABLE -->
-                <article class="card">
-                    <div class="chip">Check Out</div>
-                    <div class="card-header">Taking items (for packing or programmes)</div>
-
-                    <div class="guide-table">
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                1. Find the correct <strong>ZONE</strong> using the wall labels.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkout-zone.png" alt="Find zone">
-                            </div>
-                        </div>
-
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                2. Look for the correct <strong>bin ID</strong> (e.g., C3A).
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkout-bin.png" alt="Bin label">
-                            </div>
-                        </div>
-
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                3. Take only the quantity you need.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkout-qty.png" alt="Take qty">
-                            </div>
-                        </div>
-
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                4. Record on log sheet: Zone, Bin No., Qty OUT, Purpose , Name.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkout-log.png" alt="Log sheet">
-                            </div>
-                        </div>
-
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                5. PIC will update the Master Sheet later.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkin-update.png" alt="PIC update">
-                            </div>
-                        </div>
-
-                    </div>
-
-                </article>
-
-                <!-- CHECK IN TABLE -->
-                <article class="card">
-                    <div class="chip">Check In</div>
-                    <div class="card-header">Returning / restocking items</div>
-                    <div class="guide-tag">Always log returns so stock stays accurate.</div>
-
-                    <div class="guide-table">
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                1. Confirm the correct <strong>bin ID</strong> for the item.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkin-findbin.png" alt="Find bin">
-                            </div>
-                        </div>
-
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                2. Restock the correct quantity into the correct bin.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkin-return.png" alt="Restock">
-                            </div>
-                        </div>
-
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                3. If the bin is full, create a new bin and label it clearly. Remember to note “NEW BIN”
-                                on the log sheet so the PIC can update the master inventory easily.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkin-newbin.png" alt="New bin">
-                            </div>
-                        </div>
-
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                4. Record: Zone, Bin No., Qty IN, Purpose, Name.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkin-log.png" alt="Log entry">
-                            </div>
-                        </div>
-
-                        <div class="guide-row">
-                            <div class="guide-text">
-                                5. PIC will update the Master Sheet later.
-                            </div>
-                            <div class="guide-img">
-                                <img src="images/checkin-update.png" alt="PIC update">
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    4. The person-in-charge uses the log sheet to update the Inventory Master Sheet
+                                    later.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/overview-update.png" alt="PIC updates">
+                                </div>
                             </div>
                         </div>
                     </div>
+                </details>
 
-                </article>
+                <!-- CHECK OUT ACCORDION -->
+                <details class="accordion">
+                    <summary class="accordion-summary">
+                        <span class="summary-main">Check Out</span>
+                        <span class="summary-sub">Taking items (for packing or programmes)</span>
+                    </summary>
+                    <div class="accordion-body">
+                        <div class="guide-table">
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    1. Find the correct <strong>ZONE</strong> using the wall labels.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkout-zone.png" alt="Find zone">
+                                </div>
+                            </div>
 
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    2. Look for the correct <strong>bin ID</strong> (e.g., C3A).
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkout-bin.png" alt="Bin label">
+                                </div>
+                            </div>
+
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    3. Take only the quantity you need.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkout-qty.png" alt="Take qty">
+                                </div>
+                            </div>
+
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    4. Record on log sheet: Zone, Bin No., Qty OUT, Purpose, Name.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkout-log.png" alt="Log sheet">
+                                </div>
+                            </div>
+
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    5. PIC will update the Master Sheet later.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkin-update.png" alt="PIC update">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- CHECK IN ACCORDION -->
+                <details class="accordion">
+                    <summary class="accordion-summary">
+                        <span class="summary-main">Check In</span>
+                        <span class="summary-sub">Returning / restocking items</span>
+                    </summary>
+                    <div class="accordion-body">
+                        <div class="guide-tag">Always log returns so stock stays accurate.</div>
+
+                        <div class="guide-table">
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    1. Confirm the correct <strong>bin ID</strong> for the item.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkin-findbin.png" alt="Find bin">
+                                </div>
+                            </div>
+
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    2. Restock the correct quantity into the correct bin.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkin-return.png" alt="Restock">
+                                </div>
+                            </div>
+
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    3. If the bin is full, create a new bin and label it clearly. Remember to note
+                                    “NEW BIN” on the log sheet so the PIC can update the master inventory easily.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkin-newbin.png" alt="New bin">
+                                </div>
+                            </div>
+
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    4. Record: Zone, Bin No., Qty IN, Purpose, Name.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkin-log.png" alt="Log entry">
+                                </div>
+                            </div>
+
+                            <div class="guide-row">
+                                <div class="guide-text">
+                                    5. PIC will update the Master Sheet later.
+                                </div>
+                                <div class="guide-img">
+                                    <img src="images/checkin-update.png" alt="PIC update">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
             </div>
         </section>
 
+        <!-- BOX NAMING SYSTEM SECTION -->
+        <section class="section" id="box-system">
+            <div class="section-title">Box Naming System (Examples)</div>
+            <p class="section-subtitle">
+                How boxes/bins are labelled so everyone can find items fast and avoid confusion.
+            </p>
+
+            <details class="accordion">
+                <summary class="accordion-summary">
+                    <span class="summary-main">How to read the Bin Number</span>
+                    <span class="summary-sub">Example: E1A, E2A, E2B</span>
+                </summary>
+                <div class="accordion-body">
+                    <div class="card-header">Bin Number examples</div>
+
+                    <ul class="guide-steps">
+                        <li><strong>E1A</strong> = Electronics Category, Item 1, First Bin</li>
+                        <li><strong>E2A</strong> = Electronics Category, Item 2, First Bin</li>
+                        <li><strong>E2B</strong> = Electronics Category, Item 2, Second Bin</li>
+                    </ul>
+
+                    <p class="guide-tag">
+                        E2A &amp; E2B keep the <strong>same item</strong> but with
+                        <strong>different quantities</strong>. Never mix them. Each bin has its own quantity.
+                    </p>
+
+                    <p class="guide-tag">
+                        If you create a new bin for an item, always <strong>label it properly</strong> and write it in
+                        the log sheet so the PIC can update Excel.
+                    </p>
+                </div>
+            </details>
+        </section>
+
+        <!-- NEW TAOBAO ITEM WORKFLOW -->
+        <section class="section" id="taobao-workflow">
+            <div class="section-title">New Taobao Item? Follow This.</div>
+            <p class="section-subtitle">
+                Goal: Prevent confusion when Taobao names are different for the same item.
+            </p>
+
+            <details class="accordion">
+                <summary class="accordion-summary">
+                    <span class="summary-main">Steps (Check In)</span>
+                    <span class="summary-sub">What to do with new Taobao stock</span>
+                </summary>
+                <div class="accordion-body">
+                    <ul class="guide-steps">
+                        <li><strong>Ignore the Taobao name</strong> — names vary, not important.</li>
+                        <li>Identify the actual item (e.g., motor, pompoms, wires).</li>
+                        <li>Check the <strong>Category List (A–F)</strong> to see which group it belongs to.</li>
+                        <li>Place item into the correct <strong>metal cabinet zone</strong>.</li>
+                        <li>
+                            Put into the correct bin:
+                            <ul class="guide-steps" style="margin-top: 6px;">
+                                <li>If the bin exists → just add inside.</li>
+                                <li>If full → create a second bin (e.g., D3A → D3B).</li>
+                            </ul>
+                        </li>
+                        <li>Write simple item name on the <strong>whiteboard label</strong> (e.g., “pompom”). Do NOT use
+                            the Taobao name.</li>
+                        <li>Record the restock on the <strong>paper log sheet</strong>.</li>
+                        <li><strong>Excel is NOT updated by everyone</strong> — only the person-in-charge (PIC) updates
+                            it later.</li>
+                    </ul>
+
+                    <p class="guide-tag">
+                        Tip: Update the Material List with a <strong>Category Zone column</strong>. Makes packing &amp;
+                        restocking faster.
+                    </p>
+                </div>
+            </details>
+        </section>
+
+        <!-- EXCEL MAINTENANCE SECTION -->
+        <section class="section" id="excel-maintenance">
+            <div class="section-title">Excel Maintenance (1–2 People Only)</div>
+            <p class="section-subtitle">
+                Goal: Keep the system accurate without stressing everyone.
+            </p>
+
+            <details class="accordion">
+                <summary class="accordion-summary">
+                    <span class="summary-main">PIC Responsibilities</span>
+                    <span class="summary-sub">For the person maintaining the Excel only</span>
+                </summary>
+                <div class="accordion-body">
+                    <div class="card-header">What the PIC needs to do</div>
+                    <ul class="guide-steps">
+                        <li>Update Excel <strong>daily or weekly</strong> (daily recommended).</li>
+                        <li>Update <strong>bin quantities</strong></li>
+                        <li>Create new bin numbers when needed (e.g., B1C, C4B).</li>
+                        <li>Keep category names <strong>consistent and standardised</strong>.</li>
+                        <li>Ensure the digital list stays <strong>clean and minimal</strong>.</li>
+                    </ul>
+                </div>
+            </details>
+        </section>
+
         <footer>
-            Edm8ker Room Inventory · Internal reference page for staff and interns.
+            Edm8ker Room Inventory · Internal reference page for staff and interns · Developed by Hui Hui
         </footer>
     </div>
 </body>
