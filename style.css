@@ -232,7 +232,7 @@ header p {
 #box-system,
 #taobao-workflow,
 #excel-maintenance {
-    font-size: 13.6px;
+    font-size: 0.78rem;
 }
 
 /* Mobile stacking for guide rows */
@@ -337,3 +337,4 @@ footer {
     color: var(--text-muted);
 
 }
+
