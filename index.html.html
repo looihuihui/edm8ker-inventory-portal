@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Edm8ker Inventory Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&family=Montserrat:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --primary: #e11a78;
+            --primary-dark: #b0135d;
+            --accent: #143b63;
+            --accent-soft: #e4eef8;
+            --border-soft: #e1e4f0;
+            --text-main: #1f2933;
+            --text-muted: #5f6c80;
+            --pill-radius: 999px;
+            --card-radius: 18px;
+            --shadow-soft: 0 10px 25px rgba(20, 59, 99, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #f8fafc 0%, var(--bg) 40%, #fdfbff 100%);
+            color: var(--text-main);
+        }
+
+        .page {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 1.5rem 1.25rem 3rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        header img.logo {
+            width: 120px;
+            max-width: 40vw;
+            margin-bottom: 0.75rem;
+        }
+
+        header h1 {
+            font-family: "Lexend", system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem;
+            color: var(--accent);
+        }
+
+        header p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .section {
+            margin-bottom: 1.75rem;
+        }
+
+        .section-title {
+            font-family: "Lexend", system-ui, sans-serif;
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-box {
+            background: #ffffff;
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 1.2rem 1.2rem 1.4rem;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 1.8rem;
+        }
+
+        .section-box--highlight {
+            background: #fef3fa;
+            border-color: #f8c3df;
+        }
+
+        .card-grid {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .card-grid--two {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--card-radius);
+            box-shadow: var(--shadow-soft);
+            padding: 0.95rem 1rem;
+            border: 1px solid var(--border-soft);
+        }
+
+        .card-header {
+            font-family: "Lexend", system-ui, sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--accent);
+            margin-bottom: 0.35rem;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.15rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            background: var(--accent-soft);
+            color: var(--accent);
+            margin-bottom: 0.4rem;
+        }
+
+        .rules-list {
+            padding-left: 1.05rem;
+            margin: 0.25rem 0 0;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .rules-list li+li {
+            margin-top: 0.1rem;
+        }
+
+        /* Linktree-style buttons */
+        .button-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.6rem;
+        }
+
+        .pill-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.8rem 1.1rem;
+            border-radius: var(--pill-radius);
+            border: none;
+            text-decoration: none;
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(225, 26, 120, 0.3);
+            transition: transform 0.05s ease-out, box-shadow 0.05s ease-out, background 0.1s ease-out;
+        }
+
+        .pill-btn span.label {
+            flex: 1 1 auto;
+            text-align: left;
+        }
+
+        .pill-btn span.meta {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .pill-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(176, 19, 93, 0.35);
+        }
+
+        .pill-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(176, 19, 93, 0.3);
+        }
+
+        /* Guides */
+        .guide-steps {
+            list-style: decimal;
+            padding-left: 1.1rem;
+            margin: 0.35rem 0 0;
+            font-size: 0.82rem;
+            color: var(--text-main);
+            line-height: 1.45;
+        }
+
+        .guide-steps li+li {
+            margin-top: 0.15rem;
+        }
+
+        .guide-tag {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <header>
+            <!-- Replace "logo.png" with your actual edm8ker logo path -->
+            <img src="images/Edm8ker Logo FA - Black.png" class="logo" alt="edm8ker logo">
+            <h1>Edm8ker Room Inventory System &amp; Layout</h1>
+            <p>Quick reference for storing, taking and tracking materials in the Edm8ker room.</p>
+        </header>
+
+        <!-- RULES SECTION -->
+        <section class="section" id="rules">
+            <div class="section-title">Rules</div>
+            <p class="section-subtitle">Read once, follow always. These keep the room fast, safe and organised for
+                everyone.</p>
+
+            <div class="card-grid card-grid--two">
+                <!-- Inventory Rules -->
+                <article class="card">
+                    <div class="chip">Inventory Rules</div>
+                    <div class="card-header">CHECK OUT (Taking items)</div>
+                    <ul class="rules-list">
+                        <li>TAKE the item from the correct zone and bin.</li>
+                        <li>RECORD it on the log sheet.</li>
+                        <li>Person-in-charge will UPDATE the Inventory Master Sheet by end of day.</li>
+                    </ul>
+
+                    <div class="card-header" style="margin-top:0.7rem;">CHECK IN (Returning / restocking)</div>
+                    <ul class="rules-list">
+                        <li>RETURN / RESTOCK into the correct bin.</li>
+                        <li>RECORD it on the log sheet.</li>
+                        <li>Person-in-charge will UPDATE the Inventory Master Sheet by end of day.</li>
+                    </ul>
+                </article>
+
+                <!-- Ground Rules -->
+                <article class="card">
+                    <div class="chip">Floor &amp; Room Ground Rules</div>
+                    <div class="card-header">Keep the room usable for everyone</div>
+                    <ul class="rules-list">
+                        <li>FLOOR MUST BE CLEAR – no bags or loose items on the ground.</li>
+                        <li>DO NOT place items “temporarily” on the floor. Store them properly immediately or at the "TO
+                            BE ORGANISED" rack.</li>
+                        <li>RETURN items to the correct bin. DO NOT MIX different items in one bin.</li>
+                        <li>If a bin is FULL, CREATE a new bin, LABEL it and record it on the log sheet.</li>
+                        <li>Fold TABLE and STOOL after use and return to assigned area.</li>
+                        <li>Valuable devices stay in the LOCKED cabinet.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <!-- FIND -->
+        <section class="section" id="find-category">
+            <div class="section-box section-box--highlight">
+                <div class="section-title">Find Your Item Category</div>
+                <p class="section-subtitle">
+                    Not sure where something is stored? Use this list to check which CATEGORY ZONE
+                    your item belongs to, then walk straight there.
+                </p>
+
+                <div class="button-stack">
+                    <a class="pill-btn" href="https://docs.google.com/spreadsheets/d/1ORpKJ44Z_NyXVtPW7FNUCVcLxIy_yZ4tnnC9HEnOZlI/edit?gid=1954923618#gid=1954923618" target="_blank"
+                        rel="noopener noreferrer">
+                        <span class="label">Category &amp; Item List</span>
+                        <span class="meta">Check which zone to go to</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- PERSON IN CHARGE ONLY -->
+        <section class="section" id="pic">
+            <div class="section-box section-box--highlight">
+                <div class="section-title">For Person in Charge ONLY</div>
+                <p class="section-subtitle">
+                    Use these links only if you are maintaining the digital inventory.
+                    Everyone else only updates the paper log sheet.
+                </p>
+
+                <div class="button-stack">
+                    <a class="pill-btn" href="https://docs.google.com/spreadsheets/d/1ORpKJ44Z_NyXVtPW7FNUCVcLxIy_yZ4tnnC9HEnOZlI/edit?gid=1954923618#gid=1954923618" target="_blank"
+                        rel="noopener noreferrer">
+                        <span class="label">Category Zone List</span>
+                        <span class="meta">View what belongs in each zone</span>
+                    </a>
+
+                    <a class="pill-btn" href="https://docs.google.com/spreadsheets/d/1Mo4Zzo-sT3QW1Go5Jupbq7iUh8usddjf2yWkELnGJ4I/edit?gid=0#gid=0" target="_blank"
+                        rel="noopener noreferrer">
+                        <span class="label">Inventory Master Sheet</span>
+                        <span class="meta">For stock updates by in-charge only</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- GUIDE SECTION -->
+        <section class="section" id="guide">
+            <div class="section-title">New to the room? Start here. </div>
+            <p class="section-subtitle">
+                These short guides show you exactly how to store and take items properly.
+            </p>
+
+            <div class="card-grid">
+                <!-- Quick Map / Mental Model -->
+                <article class="card">
+                    <div class="chip">Overview</div>
+                    <div class="card-header">How the system works (in one glance)</div>
+                    <ul class="guide-steps">
+                        <li>The room is split into ZONES (A–G) such as Tools, General Craft, Decorative, Electronics,
+                            Kits and Valuables.</li>
+                        <li>Each item type lives in ONE bin with a bin ID (for example: B2A).</li>
+                        <li>You NEVER search in Excel while packing. Just use zones, bin labels and the log sheet.</li>
+                        <li>The person-in-charge uses the log sheet to update the Inventory Master Sheet later.</li>
+                    </ul>
+                    <div class="guide-tag">Goal: you can find and return items quickly, without touching a computer.
+                    </div>
+                </article>
+
+                <!-- Check Out Guide -->
+                <article class="card">
+                    <div class="chip">Check Out</div>
+                    <div class="card-header">Taking items (for packing or programmes)</div>
+                    <ol class="guide-steps">
+                        <li>Find the correct <strong>ZONE</strong> using the wall labels (Tools, Craft, Decorative,
+                            Electronics, Kits, etc.).</li>
+                        <li>Look for the correct <strong>bin ID</strong> on the shelf label (for example: C3A).</li>
+                        <li>Take only the quantity you need from that bin.</li>
+                        <li>Go to the log sheet and record:
+                            Category Zone, bin No., Qty OUT, Purpose (optional), and your Name.</li>
+                        <li>Put the bin back in the same spot on the shelf.</li>
+                    </ol>
+                    <div class="guide-tag">You are done. No Excel, no scanning, no extra steps.</div>
+                </article>
+
+                <!-- Check In Guide -->
+                <article class="card">
+                    <div class="chip">Check In</div>
+                    <div class="card-header">Returning / restocking items</div>
+                    <ol class="guide-steps">
+                        <li>Confirm which <strong>bin ID</strong> the item belongs to (check the label on the bin or
+                            zone chart).</li>
+                        <li>Return / restock the correct quantity into that bin.</li>
+                        <li>If one bin is full, create a <strong>NEW bin</strong>, label it with the next ID, and place
+                            it in the same zone.</li>
+                        <li>Go to the log sheet and record:
+                            Category Zone, bin No., Qty IN, Purpose (e.g. “Taobao stock-up”), and your Name.</li>
+                        <li>Person-in-charge will later tick the “Excel Updated” column once the master sheet is
+                            updated.</li>
+                    </ol>
+                    <div class="guide-tag">Always log what you return so stock levels stay accurate.</div>
+                </article>
+            </div>
+        </section>
+
+        <footer>
+            Edm8ker Room Inventory · Internal reference page for staff and interns.
+        </footer>
+    </div>
+</body>
+
+</html>
