@@ -215,7 +215,7 @@ header p {
 
 /* Keep text left-aligned */
 .guide-text {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     line-height: 1.45;
 }
 
@@ -335,4 +335,5 @@ footer {
     text-align: center;
     font-size: 0.72rem;
     color: var(--text-muted);
+
 }
