@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<body style="font-family:system-ui;padding:20px">
+  <h2>Seed Zones</h2>
+  <button id="seedBtn">Seed Zones to Firestore</button>
+
+  <script type="module">
+    import { ensureAuth, db } from "./js/firebase.js";
+    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const zones = [
+      { id:"A", name:"Adhesives", img:"assets/zones/adhesives.png" },
+      { id:"B", name:"Craft", img:"assets/zones/craft.png" },
+      { id:"C", name:"Electrical", img:"assets/zones/electrical.png" },
+      { id:"D", name:"Hardware", img:"assets/zones/hardware.png" },
+      { id:"E", name:"Play Kit", img:"assets/zones/playkit.png" },
+      { id:"F", name:"Cutter", img:"assets/zones/cutter.png" },
+      { id:"G", name:"Activity Helpers", img:"assets/zones/activity.png" },
+      { id:"H", name:"Paper Goods", img:"assets/zones/paper.png" },
+      { id:"I", name:"Wooden Goods", img:"assets/zones/wooden.png" },
+    ];
+
+    document.getElementById("seedBtn").onclick = async () => {
+      await ensureAuth();
+      for (const z of zones) {
+        await setDoc(doc(db, "zones", z.id), z);
+      }
+      alert("Zones seeded ✅");
+    };
+  </script>
+</body>
+</html>
