@@ -1,0 +1,83 @@
+<!-- search.html
+     Purpose: Search page with persistent results list.
+     Safe to edit: page title/subtitle text.
+     Do NOT rename IDs unless you also update js/search.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Search · Edm8ker Inventory Portal</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800;900&family=Montserrat:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <div class="phone">
+
+      <div class="panel panel-top">
+        <!-- Page top bar -->
+        <div class="page-top">
+          <button class="back-btn" id="backBtn" type="button" aria-label="Back">
+            <img src="assets/icons/back.png" alt="">
+          </button>
+
+          <div class="page-title">
+            <div class="page-h1">Search</div>
+            <div class="page-sub">Find items quickly</div>
+          </div>
+        </div>
+
+        <!-- Search input -->
+        <div class="searchbar">
+          <input id="searchInput" placeholder="Search..." autocomplete="off" />
+
+          <button class="icon-btn" id="searchBtn" type="button" aria-label="Search">
+            <img src="assets/icons/search (1).png" alt="" class="icon-img">
+          </button>
+        </div>
+
+        <!-- Results list (filled by js/search.js) -->
+        <div id="resultsWrap" class="results search-results" aria-live="polite">
+          <div id="resultsList"></div>
+        </div>
+      </div>
+
+      <!-- Bottom nav -->
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html" id="nav-home" data-nav="home">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/home.png" alt="Home"></div>
+          <div>Home</div>
+        </a>
+
+        <a href="search.html" id="nav-search" data-nav="search">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/search.png" alt="Search"></div>
+          <div>Search</div>
+        </a>
+
+        <a href="zones.html" id="nav-zones" data-nav="zones">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/zones.png" alt="Zones"></div>
+          <div>Zones</div>
+        </a>
+
+        <a href="add.html" id="nav-add" data-nav="add">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/add.png" alt="Add"></div>
+          <div>Add</div>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <script type="module" src="js/search.js"></script>
+</body>
+</html>

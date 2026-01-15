@@ -1,0 +1,96 @@
+<!-- add.html
+     Purpose: Add a new inventory item.
+     Safe to edit: form title text, placeholders, labels.
+     Do NOT rename IDs unless you also update js/add.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Item · Edm8ker Inventory Portal</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800;900&family=Montserrat:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <div class="phone">
+
+      <div class="panel panel-top">
+        <!-- top bar -->
+        <div class="form-top">
+          <button class="text-btn" id="cancelBtn" type="button">Cancel</button>
+          <div class="form-title">Add New Item</div>
+          <button class="text-btn" id="saveBtn" type="button">Save</button>
+        </div>
+
+        <!-- upload image -->
+        <div class="form-photo">
+          <div class="upload-card" id="uploadCard">
+            <div class="photo-preview" id="photoPreview">🖼️</div>
+
+            <!-- hidden file input (triggered by button) -->
+            <input type="file" id="imgFileInput" accept="image/*" hidden>
+
+            <button class="upload-btn" id="changeImgBtn" type="button">
+              Upload Image
+            </button>
+          </div>
+        </div>
+
+        <!-- add form -->
+        <form id="addForm" class="form">
+          <label class="label">Item Name</label>
+          <input class="input" id="nameInput" placeholder="E.g. Scotch Tape" required />
+
+          <label class="label">Bin/Box Number</label>
+          <input class="input" id="binInput" placeholder="E.g. A1A" required />
+
+          <label class="label">Category Type</label>
+          <select class="input" id="zoneSelect" required></select>
+
+          <label class="label">Quantity</label>
+          <input class="input" id="qtyInput" type="number" min="0" placeholder="E.g. 150" value="0" required />
+
+          <label class="label">Notes</label>
+          <textarea class="input textarea" id="notesInput" placeholder="Description here..."></textarea>
+
+          <!-- hidden submit to allow Enter key -->
+          <button type="submit" style="display:none;"></button>
+        </form>
+      </div>
+
+      <!-- bottom nav -->
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html" id="nav-home" data-nav="home">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/home.png" alt="Home"></div>
+          <div>Home</div>
+        </a>
+        <a href="search.html" id="nav-search" data-nav="search">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/search.png" alt="Search"></div>
+          <div>Search</div>
+        </a>
+        <a href="zones.html" id="nav-zones" data-nav="zones">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/zones.png" alt="Zones"></div>
+          <div>Zones</div>
+        </a>
+        <a href="add.html" id="nav-add" data-nav="add">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/add.png" alt="Add"></div>
+          <div>Add</div>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <script type="module" src="js/add.js"></script>
+</body>
+</html>

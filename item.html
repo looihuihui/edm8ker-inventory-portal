@@ -1,0 +1,107 @@
+<!-- item.html
+     Purpose: Item details page (view + adjust quantity + go to edit).
+     Do NOT rename IDs unless you also update js/item.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Item · Edm8ker Inventory Portal</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800;900&family=Montserrat:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+
+<body>
+  <div class="app">
+    <div class="phone">
+
+      <div class="panel panel-top">
+        <!-- Top bar -->
+        <div class="page-top">
+          <button class="back-btn" id="backBtn" type="button" aria-label="Back">
+            <img src="assets/icons/back.png" alt="Back">
+          </button>
+
+          <div class="page-title-title">
+            <div class="page-title-h1" id="pageTitle">Item Details</div>
+            <div class="page-sub" id="pageSub"></div>
+          </div>
+
+          <button class="text-btn" id="editBtn" type="button">Edit</button>
+        </div>
+
+        <!-- error state -->
+        <div id="errorBox" class="empty-state" style="display:none;"></div>
+
+        <!-- item content -->
+        <div id="itemWrap" style="display:none;">
+          <div class="item-top">
+            <div class="item-photo" id="itemPhoto">🖼️</div>
+
+            <div class="item-info">
+              <div class="item-detail-name" id="itemName">-</div>
+              <div class="item-detail-bin" id="itemBin">Bin: -</div>
+              <div class="item-detail-type" id="itemType">Type: -</div>
+            </div>
+          </div>
+
+          <div class="qty-card">
+            <div class="qty-label">Quantity</div>
+            <div class="qty-num" id="qtyNum">0</div>
+          </div>
+
+          <div class="adjust-block">
+            <div class="adjust-row">
+              <div class="adjust-label">Check In:</div>
+              <input class="qty-input" id="inInput" type="number" min="0" value="0"/>
+              <button class="round-btn plus" id="inBtn" type="button" aria-label="Check in">+</button>
+            </div>
+
+            <div class="adjust-row">
+              <div class="adjust-label">Check Out:</div>
+              <input class="qty-input" id="outInput" type="number" min="0" value="0"/>
+              <button class="round-btn minus" id="outBtn" type="button" aria-label="Check out">−</button>
+            </div>
+          </div>
+
+          <div class="notes-block">
+            <div class="notes-title">Notes</div>
+            <textarea id="notesArea" class="notes-area" placeholder="No notes..." readonly></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- bottom nav -->
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html" id="nav-home" data-nav="home">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/home.png" alt="Home"></div>
+          <div>Home</div>
+        </a>
+        <a href="search.html" id="nav-search" data-nav="search">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/search.png" alt="Search"></div>
+          <div>Search</div>
+        </a>
+        <a href="zones.html" id="nav-zones" data-nav="zones">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/zones.png" alt="Zones"></div>
+          <div>Zones</div>
+        </a>
+        <a href="add.html" id="nav-add" data-nav="add">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/add.png" alt="Add"></div>
+          <div>Add</div>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <script type="module" src="js/item.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!-- index.html (Home)
+     Purpose: Landing page with quick search + quick actions.
+     Safe to edit: copy text, guide steps, and button labels.
+     Do NOT rename IDs unless you also update js/home.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edm8ker Inventory Portal</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800;900&family=Montserrat:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <div class="phone">
+
+      <!-- Header -->
+      <header class="header">
+        <div class="brand-logo">
+          <img src="assets/logo/edm8ker-logo.png" alt="Edm8ker logo">
+        </div>
+        <div class="title">Edm8ker Inventory Portal</div>
+        <div class="sub">
+          Quick reference for storing, taking and tracking materials in the edm8ker room.
+        </div>
+      </header>
+
+      <!-- Main content -->
+      <main class="panel">
+
+        <!-- Search (popup results) -->
+        <section class="search-area" aria-label="Search inventory">
+          <div class="searchbar">
+            <input id="searchInput" placeholder="Search..." autocomplete="off" />
+
+            <button class="icon-btn" id="searchBtn" type="button" aria-label="Search">
+              <img src="assets/icons/search (1).png" alt="" class="icon-img">
+            </button>
+          </div>
+
+          <!-- Results popup: shown/hidden by js/home.js -->
+          <div id="resultsWrap" class="results results-pop" aria-live="polite">
+            <div id="resultsList"></div>
+          </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section aria-label="Quick actions">
+          <div class="h2">Quick Actions</div>
+
+          <div class="actions">
+            <button class="action-card" id="browseZonesBtn" type="button">
+              Browse By<br>Zones
+            </button>
+
+            <button class="action-card" id="addItemBtn" type="button">
+              Add New<br>Items
+            </button>
+          </div>
+        </section>
+
+        <!-- Guide -->
+        <section aria-label="Guide">
+          <div class="h2">Guide</div>
+
+          <!-- Safe to edit the guide copy -->
+          <div class="guide">
+            1. Use the <b>search</b> bar or <b>Zones</b> to find an item.<br />
+            2. Scan the <b>NFC tag</b> to take/return and update quantity.<br />
+            3. Free Grab Zone items <b>don’t</b> need logging.
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Bottom navigation -->
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html" id="nav-home" data-nav="home">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/home.png" alt="Home"></div>
+          <div>Home</div>
+        </a>
+
+        <a href="search.html" id="nav-search" data-nav="search">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/search.png" alt="Search"></div>
+          <div>Search</div>
+        </a>
+
+        <a href="zones.html" id="nav-zones" data-nav="zones">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/zones.png" alt="Zones"></div>
+          <div>Zones</div>
+        </a>
+
+        <a href="add.html" id="nav-add" data-nav="add">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/add.png" alt="Add"></div>
+          <div>Add</div>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <script type="module" src="js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!-- edit.html
+     Purpose: Edit an existing item (image + fields) and delete item via confirm modal.
+     Do NOT rename IDs unless you also update js/edit.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit Item · Edm8ker Inventory Portal</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800;900&family=Montserrat:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <div class="phone">
+
+      <div class="panel panel-top">
+        <!-- Top bar: Cancel | Title | Delete -->
+        <div class="form-top">
+          <button class="text-btn" id="cancelBtn" type="button">Cancel</button>
+          <div class="form-title">Edit Item</div>
+          <button class="text-btn danger-link" id="deleteBtn" type="button">Delete</button>
+        </div>
+
+        <!-- Error state -->
+        <div id="errorBox" class="empty-state" style="display:none;" aria-live="polite"></div>
+
+        <!-- Main form (shown by js/edit.js after item loads) -->
+        <div id="editWrap" style="display:none;">
+          <!-- Upload image (same UI as add) -->
+          <div class="upload-card">
+            <div class="photo-preview" id="photoPreview">
+              <img src="assets/icons/image.png" alt="">
+            </div>
+
+            <button type="button" class="upload-btn" id="changeImgBtn">Change Image</button>
+          </div>
+
+          <!-- Hidden file input used by js/edit.js -->
+          <input type="file" id="imageInput" accept="image/*" hidden />
+
+          <!-- Edit form -->
+          <form id="editForm" class="form">
+            <label class="label">Item Name</label>
+            <input class="input" id="nameInput" placeholder="E.g. Scotch Tape" required />
+
+            <label class="label">Bin/Box Number</label>
+            <input class="input" id="binInput" placeholder="E.g. A1A" required />
+
+            <label class="label">Category Type</label>
+            <select class="input" id="zoneSelect" required></select>
+
+            <label class="label">Quantity</label>
+            <input class="input" id="qtyInput" type="number" min="0" placeholder="E.g. 150" required />
+
+            <label class="label">Notes</label>
+            <textarea class="input textarea" id="notesInput" placeholder="Description here..."></textarea>
+
+            <!-- Primary CTA -->
+            <button type="submit" class="primary-btn" id="saveBtn">Save</button>
+          </form>
+        </div>
+
+        <!-- Delete confirm modal -->
+        <div class="modal-backdrop" id="confirmDeleteModal" hidden>
+          <div class="modal">
+            <div class="modal-title">Delete Item?</div>
+            <div class="modal-text">
+              This will permanently delete this item.<br>
+              This action cannot be undone.
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="modal-btn cancel" id="cancelDelete">Cancel</button>
+              <button type="button" class="modal-btn danger" id="confirmDelete">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom nav -->
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html" id="nav-home" data-nav="home">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/home.png" alt="Home"></div>
+          <div>Home</div>
+        </a>
+
+        <a href="search.html" id="nav-search" data-nav="search">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/search.png" alt="Search"></div>
+          <div>Search</div>
+        </a>
+
+        <a href="zones.html" id="nav-zones" data-nav="zones">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/zones.png" alt="Zones"></div>
+          <div>Zones</div>
+        </a>
+
+        <a href="add.html" id="nav-add" data-nav="add">
+          <div class="bubble"><img class="nav-icon" src="assets/icons/add.png" alt="Add"></div>
+          <div>Add</div>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <script type="module" src="js/edit.js"></script>
+</body>
+</html>
