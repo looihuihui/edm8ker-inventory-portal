@@ -871,7 +871,7 @@ select.input::-ms-expand{ display:none; }
 }
 
 .adjust-row{
-  grid-template-columns: 84px 1fr 56px; /* was 46px */
+  grid-template-columns: 84px 1fr 40px;
   column-gap: 12px;
 }
 
@@ -889,4 +889,5 @@ select.input::-ms-expand{ display:none; }
   width: 100%;
   min-width: 0;
 }
+
 
