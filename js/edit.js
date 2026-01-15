@@ -1,17 +1,10 @@
-// js/edit.js
-// Purpose:
-// - Edit an existing item (name, bin, zone, qty, notes, image)
-// - Save / Cancel should NOT remain in browser history
-// - Delete uses confirm modal
-
+// js/edit.js (Firestore live-ready)
+import { ensureAuth } from "./firebase.js";
 import { dbGetItem, dbGetZones, dbUpdateItem, dbDeleteItem } from "./db.js";
 import { setActiveNav, getParam } from "./app.js";
 
 setActiveNav("search");
 
-/* --------------------------------------------------
-   DOM refs
--------------------------------------------------- */
 const cancelBtn = document.getElementById("cancelBtn");
 const errorBox = document.getElementById("errorBox");
 const editWrap = document.getElementById("editWrap");
@@ -32,27 +25,20 @@ const confirmModal = document.getElementById("confirmDeleteModal");
 const confirmDelete = document.getElementById("confirmDelete");
 const cancelDelete = document.getElementById("cancelDelete");
 
-/* --------------------------------------------------
-   State
--------------------------------------------------- */
 const id = getParam("id");
 let currentItem = null;
 let imageUrl = "";
 
-/* --------------------------------------------------
-   UI helpers
--------------------------------------------------- */
+/* -------------------- UI helpers -------------------- */
 function showError(msg) {
   errorBox.style.display = "block";
   errorBox.textContent = msg;
   editWrap.style.display = "none";
 }
-
 function showForm() {
   errorBox.style.display = "none";
   editWrap.style.display = "block";
 }
-
 function escapeHtml(str) {
   return String(str || "")
     .replaceAll("&", "&amp;")
@@ -61,113 +47,65 @@ function escapeHtml(str) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-
 function renderImage() {
-  if (!photoPreview) return;
-
-  photoPreview.innerHTML = imageUrl
-    ? `<img src="${imageUrl}" alt="">`
-    : `<img src="assets/icons/image.png" alt="">`;
+  if (!imageUrl) {
+    photoPreview.innerHTML = `<img src="assets/icons/image.png" alt="">`;
+    return;
+  }
+  photoPreview.innerHTML = `<img src="${imageUrl}" alt="">`;
 }
-
-function populateZones(selected) {
-  const zones = dbGetZones();
-  zoneSelect.innerHTML = zones
-    .map(
-      z =>
-        `<option value="${escapeHtml(z.id)}">
-          ${escapeHtml(z.id)} - ${escapeHtml(z.name)}
-        </option>`
-    )
-    .join("");
-
-  if (selected) zoneSelect.value = selected;
-}
-
-/* --------------------------------------------------
-   Validation + helpers
--------------------------------------------------- */
 function numOrZero(v) {
   const n = Number(v);
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
 }
-
 function validate() {
   if (!nameInput.value.trim()) return "item name is required.";
   if (!binInput.value.trim()) return "bin number is required.";
   if (!zoneSelect.value) return "category type is required.";
   return "";
 }
-
 function retPart() {
   const ret = getParam("return");
   return ret ? `&return=${encodeURIComponent(ret)}` : "";
 }
-
-/* --------------------------------------------------
-   Navigation rule (IMPORTANT)
-   Edit page must NOT stay in history
--------------------------------------------------- */
 function goItemDetailsReplace(itemId) {
-  window.location.replace(
-    `item.html?id=${encodeURIComponent(itemId)}${retPart()}`
-  );
+  // IMPORTANT: remove Edit from history so Back from Item goes to selection page
+  window.location.replace(`item.html?id=${encodeURIComponent(itemId)}${retPart()}`);
 }
 
-/* --------------------------------------------------
-   Top actions
--------------------------------------------------- */
+/* -------------------- Events -------------------- */
 cancelBtn?.addEventListener("click", () => {
-  if (!currentItem) {
-    window.location.replace("index.html");
-    return;
-  }
+  if (!currentItem) return window.location.replace("index.html");
   goItemDetailsReplace(currentItem.id);
 });
 
-/* --------------------------------------------------
-   Form submit (Save)
--------------------------------------------------- */
-editForm?.addEventListener("submit", e => {
+editForm?.addEventListener("submit", (e) => {
   e.preventDefault();
   save();
 });
 
-/* --------------------------------------------------
-   Delete modal
--------------------------------------------------- */
+// Modal open/close
 if (confirmModal) confirmModal.hidden = true;
 
 deleteBtn?.addEventListener("click", () => {
-  if (currentItem && confirmModal) confirmModal.hidden = false;
+  if (!currentItem || !confirmModal) return;
+  confirmModal.hidden = false;
 });
-
 cancelDelete?.addEventListener("click", () => {
   if (confirmModal) confirmModal.hidden = true;
 });
-
-// tap backdrop to close
-confirmModal?.addEventListener("click", e => {
+confirmModal?.addEventListener("click", (e) => {
   if (e.target === confirmModal) confirmModal.hidden = true;
 });
 
-confirmDelete?.addEventListener("click", () => {
+confirmDelete?.addEventListener("click", async () => {
   if (!currentItem) return;
-
-  const ok = dbDeleteItem(currentItem.id);
-  if (!ok) {
-    alert("could not delete item 😭");
-    return;
-  }
-
+  await dbDeleteItem(currentItem.id);
   window.location.replace("index.html");
 });
 
-/* --------------------------------------------------
-   Image upload
--------------------------------------------------- */
+// Image upload
 changeImgBtn?.addEventListener("click", () => imageInput?.click());
-
 imageInput?.addEventListener("change", () => {
   const file = imageInput.files?.[0];
   if (!file || !file.type.startsWith("image/")) return;
@@ -180,19 +118,14 @@ imageInput?.addEventListener("change", () => {
   reader.readAsDataURL(file);
 });
 
-/* --------------------------------------------------
-   Save logic
--------------------------------------------------- */
-function save() {
+/* -------------------- Save -------------------- */
+async function save() {
   if (!currentItem) return;
 
   const err = validate();
-  if (err) {
-    alert(err);
-    return;
-  }
+  if (err) return alert(err);
 
-  const updated = dbUpdateItem(currentItem.id, {
+  const updated = await dbUpdateItem(currentItem.id, {
     name: nameInput.value.trim(),
     bin: binInput.value.trim(),
     zoneId: zoneSelect.value,
@@ -201,32 +134,29 @@ function save() {
     image: imageUrl || "",
   });
 
-  if (!updated) {
-    alert("could not save item 😭");
-    return;
-  }
-
+  if (!updated) return alert("could not save item 😭");
   goItemDetailsReplace(updated.id);
 }
 
-/* --------------------------------------------------
-   Initial load
--------------------------------------------------- */
-function load() {
-  if (!id) {
-    showError("no item selected 😅 go back and pick an item first.");
-    return;
-  }
+/* -------------------- Init -------------------- */
+async function init() {
+  if (!id) return showError("no item selected 😅 go back and pick an item first.");
 
-  currentItem = dbGetItem(id);
-  if (!currentItem) {
-    showError("item not found 😭");
-    return;
-  }
+  await ensureAuth();
+
+  // zones
+  const zones = await dbGetZones();
+  zoneSelect.innerHTML = zones
+    .map(z => `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} - ${escapeHtml(z.name)}</option>`)
+    .join("");
+
+  // item
+  currentItem = await dbGetItem(id);
+  if (!currentItem) return showError("item not found 😭");
 
   document.title = `Edit · ${currentItem.name}`;
+  zoneSelect.value = currentItem.zoneId || "";
 
-  populateZones(currentItem.zoneId);
   nameInput.value = currentItem.name || "";
   binInput.value = currentItem.bin || "";
   qtyInput.value = String(currentItem.qty ?? 0);
@@ -238,4 +168,4 @@ function load() {
   showForm();
 }
 
-load();
+init();
