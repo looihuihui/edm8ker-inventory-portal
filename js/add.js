@@ -1,15 +1,10 @@
-// js/add.js
-// Purpose: Add a new item (including optional image upload as base64 data URL).
-// Navigation: After creating an item, we pass ?return= so Item Details -> Back returns here.
-
+// js/add.js (Firestore async)
+import { ensureAuth } from "./firebase.js";
 import { dbGetZones, dbAddItem } from "./db.js";
 import { setActiveNav } from "./app.js";
 
 setActiveNav("add");
 
-/* --------------------------------------------------
-   DOM refs
--------------------------------------------------- */
 const cancelBtn = document.getElementById("cancelBtn");
 const saveBtn = document.getElementById("saveBtn");
 
@@ -24,139 +19,90 @@ const zoneSelect = document.getElementById("zoneSelect");
 const qtyInput = document.getElementById("qtyInput");
 const notesInput = document.getElementById("notesInput");
 
-/* --------------------------------------------------
-   State
--------------------------------------------------- */
 let imageUrl = "";
 
-/* --------------------------------------------------
-   Navigation
--------------------------------------------------- */
 cancelBtn?.addEventListener("click", () => {
   if (history.length > 1) history.back();
   else window.location.href = "index.html";
 });
 
 function openItem(itemId) {
-  // Return should bring user back to Add page
   const ret = encodeURIComponent(window.location.href);
   window.location.href = `item.html?id=${encodeURIComponent(itemId)}&return=${ret}`;
 }
 
-/* --------------------------------------------------
-   Zones dropdown
--------------------------------------------------- */
-function escapeHtml(str) {
-  return String(str || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function populateZones() {
-  const zones = dbGetZones();
-  zoneSelect.innerHTML = zones
-    .map(
-      (z) =>
-        `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} - ${escapeHtml(
-          z.name
-        )}</option>`
-    )
-    .join("");
-}
-
-/* --------------------------------------------------
-   Image upload (base64)
--------------------------------------------------- */
 function renderImage() {
-  if (!photoPreview) return;
-
   if (!imageUrl) {
     photoPreview.textContent = "🖼️";
     return;
   }
-
   photoPreview.innerHTML = `<img src="${imageUrl}" alt="">`;
 }
 
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result || ""));
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+changeImgBtn?.addEventListener("click", () => imgFileInput?.click());
 
-changeImgBtn?.addEventListener("click", () => {
-  imgFileInput?.click();
-});
+imgFileInput?.addEventListener("change", () => {
+  const file = imgFileInput.files?.[0];
+  if (!file || !file.type.startsWith("image/")) return;
 
-imgFileInput?.addEventListener("change", async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    imageUrl = String(reader.result || "");
+    renderImage();
+  };
+  reader.readAsDataURL(file);
 
-  if (!file.type.startsWith("image/")) {
-    alert("please upload an image file.");
-    return;
-  }
-
-  imageUrl = await fileToDataUrl(file);
-  renderImage();
-
-  // allow re-uploading the same file
   imgFileInput.value = "";
 });
 
-/* --------------------------------------------------
-   Validation + save
--------------------------------------------------- */
 function numOrZero(v) {
   const n = Number(v);
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
 }
 
 function validate() {
-  const name = (nameInput?.value || "").trim();
-  const bin = (binInput?.value || "").trim();
-  const zoneId = zoneSelect?.value || "";
-
-  if (!name) return "item name is required.";
-  if (!bin) return "bin number is required.";
-  if (!zoneId) return "category type is required.";
+  if (!nameInput.value.trim()) return "item name is required.";
+  if (!binInput.value.trim()) return "bin number is required.";
+  if (!zoneSelect.value) return "category type is required.";
   return "";
 }
 
-function save() {
-  const err = validate();
-  if (err) {
-    alert(err);
-    return;
-  }
+// Simple unique ID (NFC-friendly)
+function makeItemId() {
+  return `ITEM-${Date.now()}`;
+}
 
-  const item = dbAddItem({
-    name: nameInput.value,
-    bin: binInput.value,
+async function save() {
+  const err = validate();
+  if (err) return alert(err);
+
+  const item = {
+    id: makeItemId(),
+    name: nameInput.value.trim(),
+    bin: binInput.value.trim(),
     zoneId: zoneSelect.value,
     qty: numOrZero(qtyInput.value),
     notes: notesInput.value || "",
     image: imageUrl || "",
-  });
+  };
 
+  await dbAddItem(item);
   openItem(item.id);
 }
 
-/* --------------------------------------------------
-   Events
--------------------------------------------------- */
 saveBtn?.addEventListener("click", save);
-
 addForm?.addEventListener("submit", (e) => {
   e.preventDefault();
   save();
 });
 
-populateZones();
-renderImage();
+async function init() {
+  await ensureAuth();
+  const zones = await dbGetZones();
+  zoneSelect.innerHTML = zones
+    .map(z => `<option value="${z.id}">${z.id} - ${z.name}</option>`)
+    .join("");
+  renderImage();
+}
+
+init();
