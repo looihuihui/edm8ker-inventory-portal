@@ -1,204 +1,101 @@
-// js/db.js
-// Data store for Edm8ker Inventory Portal.
-// Storage: Browser localStorage under DB_KEY.
-// Schema: { zones: [...], items: [...] }
-//
-// NOTE:
-// - This is local-only storage. Different devices do NOT share the same data.
-// - Item IDs are stable (ITEM-0001 etc.) and can be used in NFC URLs:
-//   item.html?id=ITEM-0001
+// js/db.js (Firestore LIVE version)
+// Same function names as before, but async now.
 
-const DB_KEY = "edm8ker_inventory_v1";
+import { db } from "./firebase.js";
+import {
+  doc, setDoc, getDoc, updateDoc, deleteDoc,
+  collection, getDocs, query, where,
+  onSnapshot, serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-function nowISO() {
-  return new Date().toISOString();
-}
-
-// Initial demo data (first-time load only).
-function seedData() {
-  return {
-    zones: [
-      { id: "A", name: "Adhesives", img: "assets/zones/adhesives.png" },
-      { id: "B", name: "Craft", img: "assets/zones/craft.png" },
-      { id: "C", name: "Electrical", img: "assets/zones/electrical.png" },
-      { id: "D", name: "Hardware", img: "assets/zones/hardware.png" },
-      { id: "E", name: "Play Kit", img: "assets/zones/playkit.png" },
-      { id: "F", name: "Cutter", img: "assets/zones/cutter.png" },
-      { id: "G", name: "Activity Helpers", img: "assets/zones/activity.png" },
-      { id: "H", name: "Paper Goods", img: "assets/zones/paper.png" },
-      { id: "I", name: "Wooden Goods", img: "assets/zones/wooden.png" },
-    ],
-    items: [
-      {
-        id: "ITEM-0001",
-        name: "Scotch Tape",
-        zoneId: "A",
-        bin: "A1A",
-        qty: 100,
-        notes: "1 quantity = 1 packet\n1 packet = 5 scotch tapes",
-        image: "assets/items/scotch-tape.png",
-        createdAt: nowISO(),
-        updatedAt: nowISO(),
-      },
-      {
-        id: "ITEM-0002",
-        name: "Scotch Tape",
-        zoneId: "A",
-        bin: "A1B",
-        qty: 60,
-        notes: "",
-        image: "assets/items/scotch-tape.png",
-        createdAt: nowISO(),
-        updatedAt: nowISO(),
-      },
-      {
-        id: "ITEM-0003",
-        name: "Elmer’s Glue",
-        zoneId: "A",
-        bin: "B1A",
-        qty: 20,
-        notes: "",
-        image: "",
-        createdAt: nowISO(),
-        updatedAt: nowISO(),
-      },
-    ],
-  };
-}
-
-/* --------------------------------------------------
-   Core load/save
--------------------------------------------------- */
-export function dbLoad() {
-  const raw = localStorage.getItem(DB_KEY);
-
-  // First-time: seed DB
-  if (!raw) {
-    const seeded = seedData();
-    localStorage.setItem(DB_KEY, JSON.stringify(seeded));
-    return seeded;
-  }
-
-  // Normal load
-  try {
-    return JSON.parse(raw);
-  } catch {
-    // Corrupted JSON: re-seed
-    const seeded = seedData();
-    localStorage.setItem(DB_KEY, JSON.stringify(seeded));
-    return seeded;
-  }
-}
-
-export function dbSave(data) {
-  localStorage.setItem(DB_KEY, JSON.stringify(data));
-}
-
-/* --------------------------------------------------
+/* -----------------------------
    Zones
--------------------------------------------------- */
-export function dbGetZones() {
-  return dbLoad().zones;
+----------------------------- */
+export async function dbGetZones() {
+  const snap = await getDocs(collection(db, "zones"));
+  return snap.docs.map(d => d.data());
 }
 
-export function dbGetZone(zoneId) {
-  return dbLoad().zones.find((z) => z.id === zoneId) || null;
+export async function dbGetZone(zoneId) {
+  const snap = await getDoc(doc(db, "zones", zoneId));
+  return snap.exists() ? snap.data() : null;
 }
 
-/* --------------------------------------------------
+/* -----------------------------
    Items
--------------------------------------------------- */
-export function dbGetItems() {
-  return dbLoad().items;
+----------------------------- */
+export async function dbGetItem(itemId) {
+  const snap = await getDoc(doc(db, "items", itemId));
+  return snap.exists() ? snap.data() : null;
 }
 
-export function dbGetItemsByZone(zoneId) {
-  return dbLoad().items.filter((i) => i.zoneId === zoneId);
+export async function dbGetItemsByZone(zoneId) {
+  const q = query(collection(db, "items"), where("zoneId", "==", zoneId));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data());
 }
 
-export function dbSearchItems(query) {
-  const q = (query || "").trim().toLowerCase();
-  if (!q) return [];
+// MVP search: fetch all items then filter client-side.
+// Works fine for small inventory. For big inventory, we’ll add indexing later.
+export async function dbSearchItems(queryStr) {
+  const qStrLower = (queryStr || "").trim().toLowerCase();
+  if (!qStrLower) return [];
 
-  const data = dbLoad();
-  return data.items.filter((i) => {
-    const name = (i.name || "").toLowerCase();
-    const bin = (i.bin || "").toLowerCase();
-    const zone = (i.zoneId || "").toLowerCase();
+  const snap = await getDocs(collection(db, "items"));
+  return snap.docs
+    .map(d => d.data())
+    .filter(i =>
+      (i.name || "").toLowerCase().includes(qStrLower) ||
+      (i.bin || "").toLowerCase().includes(qStrLower) ||
+      (i.zoneId || "").toLowerCase().includes(qStrLower)
+    );
+}
 
-    return name.includes(q) || bin.includes(q) || zone.includes(q);
+export async function dbAddItem(item) {
+  await setDoc(doc(db, "items", item.id), {
+    ...item,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
   });
-}
-
-export function dbGetItem(itemId) {
-  return dbLoad().items.find((i) => i.id === itemId) || null;
-}
-
-/* --------------------------------------------------
-   Mutations
--------------------------------------------------- */
-// Generates next ID in ITEM-0004 style.
-// Uses existing numeric max, then +1.
-function newId(items) {
-  const nums = items
-    .map((i) => (i.id || "").match(/ITEM-(\d+)/))
-    .filter(Boolean)
-    .map((m) => parseInt(m[1], 10));
-
-  const next = (nums.length ? Math.max(...nums) : 0) + 1;
-  return `ITEM-${String(next).padStart(4, "0")}`;
-}
-
-export function dbAddItem(payload) {
-  const data = dbLoad();
-  const id = newId(data.items);
-
-  const item = {
-    id,
-    name: payload.name?.trim() || "",
-    zoneId: payload.zoneId || "",
-    bin: payload.bin?.trim() || "",
-    qty: Number(payload.qty || 0),
-    notes: payload.notes || "",
-    image: payload.image || "", // can be asset path OR base64 data URL
-    createdAt: nowISO(),
-    updatedAt: nowISO(),
-  };
-
-  data.items.unshift(item);
-  dbSave(data);
   return item;
 }
 
-export function dbUpdateItem(itemId, patch) {
-  const data = dbLoad();
-  const idx = data.items.findIndex((i) => i.id === itemId);
-  if (idx === -1) return null;
-
-  data.items[idx] = {
-    ...data.items[idx],
+export async function dbUpdateItem(itemId, patch) {
+  await updateDoc(doc(db, "items", itemId), {
     ...patch,
-    updatedAt: nowISO(),
-  };
-
-  dbSave(data);
-  return data.items[idx];
+    updatedAt: serverTimestamp(),
+  });
+  return await dbGetItem(itemId);
 }
 
-export function dbAdjustQty(itemId, delta) {
-  const item = dbGetItem(itemId);
+export async function dbAdjustQty(itemId, delta) {
+  const item = await dbGetItem(itemId);
   if (!item) return null;
 
   const nextQty = Math.max(0, Number(item.qty || 0) + Number(delta || 0));
-  return dbUpdateItem(itemId, { qty: nextQty });
+  await updateDoc(doc(db, "items", itemId), {
+    qty: nextQty,
+    updatedAt: serverTimestamp(),
+  });
+
+  return nextQty;
 }
 
-export function dbDeleteItem(itemId) {
-  const data = dbLoad();
-  const before = data.items.length;
+export async function dbDeleteItem(itemId) {
+  await deleteDoc(doc(db, "items", itemId));
+  return true;
+}
 
-  data.items = data.items.filter((i) => i.id !== itemId);
+/* -----------------------------
+   LIVE listeners (THIS = "LIVE")
+----------------------------- */
+export function dbListenItem(itemId, cb) {
+  return onSnapshot(doc(db, "items", itemId), (snap) => {
+    cb(snap.exists() ? snap.data() : null);
+  });
+}
 
-  dbSave(data);
-  return data.items.length !== before; // true if deleted
+export function dbListenItemsByZone(zoneId, cb) {
+  const q = query(collection(db, "items"), where("zoneId", "==", zoneId));
+  return onSnapshot(q, (snap) => cb(snap.docs.map(d => d.data())));
 }
