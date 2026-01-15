@@ -1,33 +1,15 @@
-// js/item.js
-// Purpose: Item details page (view info, adjust quantity, jump to edit).
-// Navigation contract:
-// - Open via: item.html?id=ITEM-0001&return=<encoded-url>
-// - Back button prefers return= if provided.
-// - Edit page must receive the same return= so Save/Cancel keeps users going back to selection page.
-
-import { dbGetItem, dbAdjustQty } from "./db.js";
+// js/item.js (Firestore live)
+import { ensureAuth } from "./firebase.js";
+import { dbListenItem, dbAdjustQty } from "./db.js";
 import { setActiveNav, getParam } from "./app.js";
 
 setActiveNav("search");
 
-/* --------------------------------------------------
-   Category label map (display only)
--------------------------------------------------- */
 const CATEGORY_MAP = {
-  A: "Adhesives",
-  B: "Craft",
-  C: "Electrical",
-  D: "Hardware",
-  E: "Play Kit",
-  F: "Cutter",
-  G: "Activity Helpers",
-  H: "Paper Goods",
-  I: "Wooden Goods",
+  A: "Adhesives", B: "Craft", C: "Electrical", D: "Hardware",
+  E: "Play Kit", F: "Cutter", G: "Activity Helpers", H: "Paper Goods", I: "Wooden Goods",
 };
 
-/* --------------------------------------------------
-   DOM refs
--------------------------------------------------- */
 const backBtn = document.getElementById("backBtn");
 const editBtn = document.getElementById("editBtn");
 
@@ -46,40 +28,28 @@ const outInput = document.getElementById("outInput");
 const inBtn = document.getElementById("inBtn");
 const outBtn = document.getElementById("outBtn");
 
-/* --------------------------------------------------
-   Params / state
--------------------------------------------------- */
 const id = getParam("id");
-const returnTo = getParam("return"); // optional
+const returnTo = getParam("return");
 
 let currentItem = null;
+let unsub = null;
 
-/* --------------------------------------------------
-   Navigation
--------------------------------------------------- */
 backBtn?.addEventListener("click", () => {
   if (returnTo) {
-    // return= is already encoded once by previous page
     window.location.href = decodeURIComponent(returnTo);
     return;
   }
-
   if (history.length > 1) history.back();
   else window.location.href = "index.html";
 });
 
 editBtn?.addEventListener("click", () => {
   if (!currentItem) return;
-
   const ret = getParam("return");
   const retPart = ret ? `&return=${encodeURIComponent(ret)}` : "";
-
   window.location.href = `edit.html?id=${encodeURIComponent(currentItem.id)}${retPart}`;
 });
 
-/* --------------------------------------------------
-   UI helpers
--------------------------------------------------- */
 function showError(msg) {
   errorBox.style.display = "block";
   errorBox.textContent = msg;
@@ -93,10 +63,8 @@ function showItem() {
 
 function escapeHtml(str) {
   return String(str || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
 
@@ -105,69 +73,63 @@ function numOrZero(v) {
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
 }
 
-/* --------------------------------------------------
-   Render / Load
--------------------------------------------------- */
-function loadItem() {
-  currentItem = id ? dbGetItem(id) : null;
+function render(item) {
+  document.title = `${item.name} · Item`;
+  itemName.textContent = item.name || "-";
+  itemBin.textContent = `Bin/Box: ${item.bin || "-"}`;
 
-  if (!currentItem) {
-    showError("item not found 😭 try going back and searching again.");
-    return;
-  }
-
-  document.title = `${currentItem.name} · Item`;
-
-  itemName.textContent = currentItem.name || "-";
-  itemBin.textContent = `Bin/Box: ${currentItem.bin || "-"}`;
-
-  const code = String(currentItem.zoneId || "-").trim();
+  const code = String(item.zoneId || "-").trim();
   const label = CATEGORY_MAP[code] || "";
   itemType.textContent = label ? `Type: ${code} - ${label}` : `Type: ${code}`;
 
-  qtyNum.textContent = String(currentItem.qty ?? 0);
-  notesArea.value = currentItem.notes || "";
+  qtyNum.textContent = String(item.qty ?? 0);
+  notesArea.value = item.notes || "";
 
-  if (currentItem.image) {
-    itemPhoto.innerHTML = `<img src="${escapeHtml(currentItem.image)}" alt="">`;
-  } else {
-    itemPhoto.textContent = "🖼️";
-  }
+  if (item.image) itemPhoto.innerHTML = `<img src="${escapeHtml(item.image)}" alt="">`;
+  else itemPhoto.textContent = "🖼️";
 
   showItem();
 }
 
-function refreshQty() {
-  const fresh = dbGetItem(currentItem.id);
-  if (!fresh) return;
-
-  currentItem = fresh;
-  qtyNum.textContent = String(currentItem.qty ?? 0);
-}
-
-/* --------------------------------------------------
-   Quantity adjust
--------------------------------------------------- */
-inBtn?.addEventListener("click", () => {
+inBtn?.addEventListener("click", async () => {
   if (!currentItem) return;
-
   const amt = numOrZero(inInput.value);
   if (!amt) return;
 
-  dbAdjustQty(currentItem.id, +amt);
+  await dbAdjustQty(currentItem.id, +amt);
   inInput.value = "0";
-  refreshQty();
 });
 
-outBtn?.addEventListener("click", () => {
+outBtn?.addEventListener("click", async () => {
   if (!currentItem) return;
-
   const amt = numOrZero(outInput.value);
   if (!amt) return;
 
-  dbAdjustQty(currentItem.id, -amt);
+  await dbAdjustQty(currentItem.id, -amt);
   outInput.value = "0";
-  refreshQty();
 });
 
-loadItem();
+async function init() {
+  if (!id) {
+    showError("no item selected 😅");
+    return;
+  }
+
+  await ensureAuth();
+
+  // LIVE subscription: phone and laptop sync instantly
+  unsub = dbListenItem(id, (item) => {
+    if (!item) {
+      showError("item not found 😭");
+      currentItem = null;
+      return;
+    }
+    currentItem = item;
+    render(item);
+  });
+}
+
+init();
+
+// cleanup (optional)
+window.addEventListener("beforeunload", () => unsub?.());
