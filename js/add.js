@@ -22,9 +22,9 @@ const notesInput = document.getElementById("notesInput");
 let imageUrl = "";
 
 cancelBtn?.addEventListener("click", () => {
-  if (history.length > 1) history.back();
-  else window.location.href = "index.html";
+  window.location.replace("index.html");
 });
+
 
 function openItem(itemId) {
   const ret = encodeURIComponent(window.location.href);
@@ -106,3 +106,4 @@ async function init() {
 }
 
 init();
+
