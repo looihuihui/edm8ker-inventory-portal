@@ -75,9 +75,9 @@ function goItemDetailsReplace(itemId) {
 
 /* -------------------- Events -------------------- */
 cancelBtn?.addEventListener("click", () => {
-  if (!currentItem) return window.location.replace("index.html");
-  goItemDetailsReplace(currentItem.id);
+  window.location.replace("index.html");
 });
+
 
 editForm?.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -169,3 +169,4 @@ async function init() {
 }
 
 init();
+
