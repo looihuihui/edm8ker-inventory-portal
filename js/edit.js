@@ -75,8 +75,18 @@ function goItemDetailsReplace(itemId) {
 
 /* -------------------- Events -------------------- */
 cancelBtn?.addEventListener("click", () => {
-  window.location.replace("index.html");
+  if (!currentItem) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  const ret = getParam("return");
+  const retPart = ret ? `&return=${encodeURIComponent(ret)}` : "";
+
+  // go back to item details, and remove edit page from history
+  window.location.replace(`item.html?id=${encodeURIComponent(currentItem.id)}${retPart}`);
 });
+
 
 
 editForm?.addEventListener("submit", (e) => {
@@ -169,4 +179,5 @@ async function init() {
 }
 
 init();
+
 
