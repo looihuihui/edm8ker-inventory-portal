@@ -1,7 +1,8 @@
-// js/add.js
-// Purpose: Add a new item (including optional image upload as base64 data URL).
+// js/add.js (Firestore live-ready)
+// Purpose: Add a new item (optional image base64 for now)
 // Navigation: After creating an item, we pass ?return= so Item Details -> Back returns here.
 
+import { ensureAuth } from "./firebase.js";
 import { dbGetZones, dbAddItem } from "./db.js";
 import { setActiveNav } from "./app.js";
 
@@ -44,7 +45,7 @@ function openItem(itemId) {
 }
 
 /* --------------------------------------------------
-   Zones dropdown
+   Helpers
 -------------------------------------------------- */
 function escapeHtml(str) {
   return String(str || "")
@@ -55,37 +56,6 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
-function populateZones() {
-  if (!zoneSelect) {
-    console.error("❌ zoneSelect is null. Your HTML id is wrong or script runs too early.");
-    alert("zoneSelect not found. Check HTML: id='zoneSelect'");
-    return;
-  }
-
-  const zones = dbGetZones();
-  console.log("zones:", zones);
-
-  if (!Array.isArray(zones) || zones.length === 0) {
-    console.error("❌ zones empty. dbGetZones() returned:", zones);
-    zoneSelect.innerHTML = `<option value="">No zones found</option>`;
-    alert("No zones found. dbGetZones() is empty.");
-    return;
-  }
-
-  zoneSelect.innerHTML = zones
-    .map(
-      (z) =>
-        `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} - ${escapeHtml(z.name)}</option>`
-    )
-    .join("");
-
-  console.log("✅ options count:", zoneSelect.options.length);
-}
-
-
-/* --------------------------------------------------
-   Image upload (base64)
--------------------------------------------------- */
 function renderImage() {
   if (!photoPreview) return;
 
@@ -106,29 +76,6 @@ function fileToDataUrl(file) {
   });
 }
 
-changeImgBtn?.addEventListener("click", () => {
-  imgFileInput?.click();
-});
-
-imgFileInput?.addEventListener("change", async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    alert("please upload an image file.");
-    return;
-  }
-
-  imageUrl = await fileToDataUrl(file);
-  renderImage();
-
-  // allow re-uploading the same file
-  imgFileInput.value = "";
-});
-
-/* --------------------------------------------------
-   Validation + save
--------------------------------------------------- */
 function numOrZero(v) {
   const n = Number(v);
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
@@ -145,34 +92,76 @@ function validate() {
   return "";
 }
 
-function save() {
-  const err = validate();
-  if (err) {
-    alert(err);
+/* --------------------------------------------------
+   Image upload (base64)
+-------------------------------------------------- */
+changeImgBtn?.addEventListener("click", () => {
+  imgFileInput?.click();
+});
+
+imgFileInput?.addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("please upload an image file.");
     return;
   }
 
-  const item = dbAddItem({
-    name: nameInput.value,
-    bin: binInput.value,
+  imageUrl = await fileToDataUrl(file);
+  renderImage();
+
+  // allow re-uploading same file
+  imgFileInput.value = "";
+});
+
+/* --------------------------------------------------
+   Save
+-------------------------------------------------- */
+async function save() {
+  const err = validate();
+  if (err) return alert(err);
+
+  const item = await dbAddItem({
+    name: nameInput.value.trim(),
+    bin: binInput.value.trim(),
     zoneId: zoneSelect.value,
     qty: numOrZero(qtyInput.value),
     notes: notesInput.value || "",
     image: imageUrl || "",
   });
 
+  if (!item) return alert("could not add item 😭");
   openItem(item.id);
 }
 
 /* --------------------------------------------------
    Events
 -------------------------------------------------- */
-saveBtn?.addEventListener("click", save);
+saveBtn?.addEventListener("click", () => save());
 
 addForm?.addEventListener("submit", (e) => {
   e.preventDefault();
   save();
 });
 
-populateZones();
-renderImage();
+/* --------------------------------------------------
+   Init (same style as edit.js)
+-------------------------------------------------- */
+async function init() {
+  await ensureAuth();
+
+  const zones = await dbGetZones();
+  zoneSelect.innerHTML = zones
+    .map(
+      (z) =>
+        `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} - ${escapeHtml(
+          z.name
+        )}</option>`
+    )
+    .join("");
+
+  renderImage();
+}
+
+init();
