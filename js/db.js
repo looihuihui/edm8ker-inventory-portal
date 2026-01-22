@@ -6,6 +6,7 @@ import {
   doc, setDoc, getDoc, updateDoc, deleteDoc,
   collection, getDocs, query, where,
   onSnapshot, serverTimestamp,
+  addDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* -----------------------------
@@ -52,12 +53,14 @@ export async function dbSearchItems(queryStr) {
 }
 
 export async function dbAddItem(item) {
-  await setDoc(doc(db, "items", item.id), {
+  const ref = await addDoc(collection(db, "items"), {
     ...item,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
-  return item;
+
+  // return the item with generated id (so add.js can openItem(item.id))
+  return { ...item, id: ref.id };
 }
 
 export async function dbUpdateItem(itemId, patch) {
@@ -99,3 +102,4 @@ export function dbListenItemsByZone(zoneId, cb) {
   const q = query(collection(db, "items"), where("zoneId", "==", zoneId));
   return onSnapshot(q, (snap) => cb(snap.docs.map(d => d.data())));
 }
+
