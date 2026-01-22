@@ -149,19 +149,29 @@ addForm?.addEventListener("submit", (e) => {
    Init (same style as edit.js)
 -------------------------------------------------- */
 async function init() {
-  await ensureAuth();
+  try {
+    console.log("ADD init start");
 
-  const zones = await dbGetZones();
-  zoneSelect.innerHTML = zones
-    .map(
-      (z) =>
-        `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} - ${escapeHtml(
-          z.name
-        )}</option>`
-    )
-    .join("");
+    await ensureAuth();
+    console.log("ensureAuth ✅");
 
-  renderImage();
+    const zones = await dbGetZones();
+    console.log("zones fetched:", zones);
+
+    if (!zones || zones.length === 0) {
+      alert("zones fetched is empty. check dbGetZones console error.");
+    }
+
+    zoneSelect.innerHTML = (zones || [])
+      .map(z => `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} - ${escapeHtml(z.name)}</option>`)
+      .join("");
+
+    renderImage();
+  } catch (e) {
+    console.error("ADD init failed:", e);
+    alert("Add page cannot load zones. Open console (F12) to see error.");
+  }
 }
 
 init();
+
