@@ -1,9 +1,18 @@
 // js/db.js (Firestore LIVE version)
-// Same function names as before, but async now.
 
 import { db } from "./firebase.js";
 import {
-  doc, setDoc, serverTimestamp,
+  // doc helpers
+  doc, collection,
+
+  // write
+  setDoc, updateDoc, deleteDoc, serverTimestamp,
+
+  // read
+  getDoc, getDocs, query, where,
+
+  // live
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* -----------------------------
@@ -11,12 +20,13 @@ import {
 ----------------------------- */
 export async function dbGetZones() {
   const snap = await getDocs(collection(db, "zones"));
-  return snap.docs.map(d => d.data());
+  // include id so your UI can use it safely
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
 export async function dbGetZone(zoneId) {
   const snap = await getDoc(doc(db, "zones", zoneId));
-  return snap.exists() ? snap.data() : null;
+  return snap.exists() ? ({ id: snap.id, ...snap.data() }) : null;
 }
 
 /* -----------------------------
@@ -24,24 +34,23 @@ export async function dbGetZone(zoneId) {
 ----------------------------- */
 export async function dbGetItem(itemId) {
   const snap = await getDoc(doc(db, "items", itemId));
-  return snap.exists() ? snap.data() : null;
+  return snap.exists() ? ({ id: snap.id, ...snap.data() }) : null;
 }
 
 export async function dbGetItemsByZone(zoneId) {
   const q = query(collection(db, "items"), where("zoneId", "==", zoneId));
   const snap = await getDocs(q);
-  return snap.docs.map(d => d.data());
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
 // MVP search: fetch all items then filter client-side.
-// Works fine for small inventory. For big inventory, we’ll add indexing later.
 export async function dbSearchItems(queryStr) {
   const qStrLower = (queryStr || "").trim().toLowerCase();
   if (!qStrLower) return [];
 
   const snap = await getDocs(collection(db, "items"));
   return snap.docs
-    .map(d => d.data())
+    .map(d => ({ id: d.id, ...d.data() }))
     .filter(i =>
       (i.name || "").toLowerCase().includes(qStrLower) ||
       (i.bin || "").toLowerCase().includes(qStrLower) ||
@@ -50,11 +59,12 @@ export async function dbSearchItems(queryStr) {
 }
 
 export async function dbAddItem(item) {
-  const ref = doc(collection(db, "items")); // creates a doc ref with random id
+  // create random id
+  const ref = doc(collection(db, "items"));
 
   await setDoc(ref, {
     ...item,
-    id: ref.id, // store id in the doc data too
+    id: ref.id, // store id in doc too (optional but convenient)
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -89,17 +99,15 @@ export async function dbDeleteItem(itemId) {
 }
 
 /* -----------------------------
-   LIVE listeners (THIS = "LIVE")
+   LIVE listeners
 ----------------------------- */
 export function dbListenItem(itemId, cb) {
   return onSnapshot(doc(db, "items", itemId), (snap) => {
-    cb(snap.exists() ? snap.data() : null);
+    cb(snap.exists() ? ({ id: snap.id, ...snap.data() }) : null);
   });
 }
 
 export function dbListenItemsByZone(zoneId, cb) {
   const q = query(collection(db, "items"), where("zoneId", "==", zoneId));
-  return onSnapshot(q, (snap) => cb(snap.docs.map(d => d.data())));
+  return onSnapshot(q, (snap) => cb(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
 }
-
-
