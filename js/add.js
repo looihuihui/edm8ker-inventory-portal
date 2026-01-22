@@ -1,11 +1,9 @@
 // js/add.js
-// Purpose: Add a new item (image upload -> compress -> Firebase Storage -> save URL in Firestore)
+// Purpose: Add a new item (including optional image upload as base64 data URL).
+// Navigation: After creating an item, we pass ?return= so Item Details -> Back returns here.
 
 import { dbGetZones, dbAddItem } from "./db.js";
 import { setActiveNav } from "./app.js";
-
-// ✅ ADD THESE IMPORTS (Firebase Storage)
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
 setActiveNav("add");
 
@@ -29,9 +27,7 @@ const notesInput = document.getElementById("notesInput");
 /* --------------------------------------------------
    State
 -------------------------------------------------- */
-// ✅ change meaning: now we store DOWNLOAD URL, not base64
 let imageUrl = "";
-let imageFile = null; // ✅ keep the selected file in memory
 
 /* --------------------------------------------------
    Navigation
@@ -42,6 +38,7 @@ cancelBtn?.addEventListener("click", () => {
 });
 
 function openItem(itemId) {
+  // Return should bring user back to Add page
   const ret = encodeURIComponent(window.location.href);
   window.location.href = `item.html?id=${encodeURIComponent(itemId)}&return=${ret}`;
 }
@@ -71,67 +68,26 @@ function populateZones() {
 }
 
 /* --------------------------------------------------
-   ✅ Image compress + preview + upload
+   Image upload (base64)
 -------------------------------------------------- */
-
-// ✅ new: compress to webp
-async function compressImage(file, {
-  maxWidth = 1280,
-  maxHeight = 1280,
-  quality = 0.7,
-  mimeType = "image/webp",
-} = {}) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const reader = new FileReader();
-
-    reader.onload = (e) => (img.src = e.target.result);
-    reader.onerror = reject;
-
-    img.onload = () => {
-      let { width, height } = img;
-
-      const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
-      width = Math.round(width * ratio);
-      height = Math.round(height * ratio);
-
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, width, height);
-
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) return reject("Compression failed");
-
-          const newName = file.name.replace(/\.\w+$/, ".webp");
-          const compressedFile = new File([blob], newName, { type: mimeType });
-          resolve(compressedFile);
-        },
-        mimeType,
-        quality
-      );
-    };
-
-    img.onerror = () => reject("Image load error");
-    reader.readAsDataURL(file);
-  });
-}
-
-function renderImagePreviewFromUrl(url) {
+function renderImage() {
   if (!photoPreview) return;
-  if (!url) {
+
+  if (!imageUrl) {
     photoPreview.textContent = "🖼️";
     return;
   }
-  photoPreview.innerHTML = `<img src="${url}" alt="">`;
+
+  photoPreview.innerHTML = `<img src="${imageUrl}" alt="">`;
 }
 
-// ✅ helper: show preview from File (without base64 storing in Firestore)
-function fileToObjectUrl(file) {
-  return URL.createObjectURL(file);
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 changeImgBtn?.addEventListener("click", () => {
@@ -139,51 +95,20 @@ changeImgBtn?.addEventListener("click", () => {
 });
 
 imgFileInput?.addEventListener("change", async (e) => {
-  const original = e.target.files?.[0];
-  if (!original) return;
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-  if (!original.type.startsWith("image/")) {
+  if (!file.type.startsWith("image/")) {
     alert("please upload an image file.");
     return;
   }
 
-  // optional guardrail
-  if (original.size > 8 * 1024 * 1024) {
-    alert("image too big (max 8MB).");
-    return;
-  }
+  imageUrl = await fileToDataUrl(file);
+  renderImage();
 
-  // ✅ compress
-  const compressed = await compressImage(original);
-
-  // optional: ensure it stays under ~900KB
-  if (compressed.size > 900 * 1024) {
-    alert("image still too big after compression. try another photo.");
-    return;
-  }
-
-  // ✅ store file in memory (NOT base64)
-  imageFile = compressed;
-
-  // ✅ preview using object URL
-  const previewUrl = fileToObjectUrl(compressed);
-  renderImagePreviewFromUrl(previewUrl);
-
-  // allow re-uploading same file
+  // allow re-uploading the same file
   imgFileInput.value = "";
 });
-
-// ✅ upload to Firebase Storage, return download URL
-async function uploadImageToStorage(file, itemId) {
-  const storage = getStorage();
-  const safeName = (file.name || "image.webp").replace(/[^\w.\-]+/g, "_");
-  const path = `items/${itemId}/${Date.now()}_${safeName}`;
-
-  const fileRef = ref(storage, path);
-  await uploadBytes(fileRef, file);
-  const url = await getDownloadURL(fileRef);
-  return url;
-}
 
 /* --------------------------------------------------
    Validation + save
@@ -204,46 +129,23 @@ function validate() {
   return "";
 }
 
-// ✅ make save async because upload is async
-async function save() {
+function save() {
   const err = validate();
   if (err) {
     alert(err);
     return;
   }
 
-  // 1) create item FIRST (without image)
   const item = dbAddItem({
     name: nameInput.value,
     bin: binInput.value,
     zoneId: zoneSelect.value,
     qty: numOrZero(qtyInput.value),
     notes: notesInput.value || "",
-    image: "", // ✅ no base64
+    image: imageUrl || "",
   });
 
-  try {
-    // 2) if user picked image, upload to Storage
-    if (imageFile) {
-      const url = await uploadImageToStorage(imageFile, item.id);
-
-      // 3) update the item with image URL
-      // easiest: call dbAddItem-style update if you have one
-      // but since you only showed dbAddItem, we can re-add overwrite pattern if your db supports it.
-      // ✅ assuming dbAddItem returns doc and your db.js has update fn:
-      // await dbUpdateItem(item.id, { image: url });
-
-      // 🚨 TEMP fallback: if dbAddItem writes firestore doc, you MUST add dbUpdateItem in db.js.
-      // For now just store URL locally and open item page (item page can show it after update).
-      imageUrl = url;
-    }
-
-    openItem(item.id);
-  } catch (e) {
-    console.error(e);
-    alert("image upload failed. item saved without image.");
-    openItem(item.id);
-  }
+  openItem(item.id);
 }
 
 /* --------------------------------------------------
@@ -257,4 +159,4 @@ addForm?.addEventListener("submit", (e) => {
 });
 
 populateZones();
-renderImagePreviewFromUrl("");
+renderImage();
