@@ -56,16 +56,32 @@ function escapeHtml(str) {
 }
 
 function populateZones() {
+  if (!zoneSelect) {
+    console.error("❌ zoneSelect is null. Your HTML id is wrong or script runs too early.");
+    alert("zoneSelect not found. Check HTML: id='zoneSelect'");
+    return;
+  }
+
   const zones = dbGetZones();
+  console.log("zones:", zones);
+
+  if (!Array.isArray(zones) || zones.length === 0) {
+    console.error("❌ zones empty. dbGetZones() returned:", zones);
+    zoneSelect.innerHTML = `<option value="">No zones found</option>`;
+    alert("No zones found. dbGetZones() is empty.");
+    return;
+  }
+
   zoneSelect.innerHTML = zones
     .map(
       (z) =>
-        `<option value="${escapeHtml(z.id)}">
-          ${escapeHtml(z.id)} - ${escapeHtml(z.name)}
-        </option>`
+        `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} - ${escapeHtml(z.name)}</option>`
     )
     .join("");
+
+  console.log("✅ options count:", zoneSelect.options.length);
 }
+
 
 /* --------------------------------------------------
    Image upload (base64)
