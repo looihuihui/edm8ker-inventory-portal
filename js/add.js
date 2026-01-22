@@ -60,9 +60,9 @@ function populateZones() {
   zoneSelect.innerHTML = zones
     .map(
       (z) =>
-        `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} - ${escapeHtml(
-          z.name
-        )}</option>`
+        `<option value="${escapeHtml(z.id)}">
+          ${escapeHtml(z.id)} - ${escapeHtml(z.name)}
+        </option>`
     )
     .join("");
 }
