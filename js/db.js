@@ -2,16 +2,9 @@
 
 import { db } from "./firebase.js";
 import {
-  // doc helpers
   doc, collection,
-
-  // write
   setDoc, updateDoc, deleteDoc, serverTimestamp,
-
-  // read
   getDoc, getDocs, query, where,
-
-  // live
   onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
@@ -20,15 +13,18 @@ import {
 ----------------------------- */
 export async function dbGetZones() {
   const snap = await getDocs(collection(db, "zones"));
-  // include id so your UI can use it safely
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map(d => ({
+    ...d.data(),     // keeps your existing {id:"A", name:"...", img:"..."}
+    docId: d.id      // extra field in case you need it later
+  }));
 }
 
 export async function dbGetZone(zoneId) {
   const snap = await getDoc(doc(db, "zones", zoneId));
-  return snap.exists() ? ({ id: snap.id, ...snap.data() }) : null;
+  return snap.exists()
+    ? ({ ...snap.data(), docId: snap.id })
+    : null;
 }
-
 /* -----------------------------
    Items
 ----------------------------- */
@@ -111,3 +107,4 @@ export function dbListenItemsByZone(zoneId, cb) {
   const q = query(collection(db, "items"), where("zoneId", "==", zoneId));
   return onSnapshot(q, (snap) => cb(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
 }
+
